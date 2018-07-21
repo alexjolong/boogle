@@ -14,14 +14,12 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
-    //TODO: Create a letter frequency dictionary so that common letters appear more frequently
-    String mAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     TableLayout mBoard;
     Button checkButton;
     Button endGameButton;
     TextView currentWordText;
     TextView scoreText;
-    int mBoardDim = 4;
+    private int mBoardDim = 4;
     int mPoints;
     /*
     *  For now, we will store the current word as a list of indices into the board.
@@ -35,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
+        setContentView(R.layout.activity_main);
         mPoints = 0;
         currentWord = new ArrayList<>();
         mBoard = findViewById(R.id.mBoard);
@@ -45,11 +43,9 @@ public class MainActivity extends AppCompatActivity {
         currentWordText = findViewById(R.id.current_word);
         scoreText = findViewById(R.id.score);
 
-        int res = createBoard(mBoardDim, mBoardDim, mBoard);
-        if (res != 0) {
-            //TODO: raise error
-            return;
-        }
+        GameplayManager gpm = new GameplayManager(2);
+        BoardManager bm = new BoardManager(this, gpm, mBoard, mBoardDim);
+
         updateCurrentWordDisplay();
         updatePointsDisplay();
         checkButton.setOnClickListener(new View.OnClickListener() {
@@ -77,75 +73,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public int createBoard(int rows, int cols, TableLayout board) {
-
-        // Create each of the squares on the board
-        for (int i = 0; i < rows; i++) {
-            TableRow tr = new TableRow(this);
-            board.addView(tr);
-
-            for (int j = 0; j < cols; j++) {
-                int buttonIndex = (i*rows) + j;
-                Button newLetter = new Button(this);
-                CharSequence newLetterText = chooseLetterEngine();
-                newLetter.setText(newLetterText);
-                newLetter.setId(buttonIndex);
-                newLetter.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        // TODO Auto-generated method stub
-                        System.out.println("Board tile was tapped");
-                        tapBoardButton((Button) v);
-                    }
-                });
-                tr.addView(newLetter);
-            }
-        }
-        return 0;
-    }
-
     public int refreshBoard(int rows, int cols, TableLayout board) {
 
-        // Create each of the squares on the board
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                int buttonIndex = (i*rows) + j;
-                Button newLetter = findViewById(buttonIndex);
-                CharSequence newLetterText = chooseLetterEngine();
-                newLetter.setText(newLetterText);
-            }
-        }
-        return 0;
+
     }
 
-    public CharSequence chooseLetterEngine() {
-        Random rand = new Random();
-        int alphabetLength = mAlphabet.length();
-        int charIndex = rand.nextInt(alphabetLength);
-        Character newChar = mAlphabet.charAt(charIndex);
-        CharSequence newLetter = newChar.toString();
-        return newLetter;
-    }
-
-    public void tapBoardButton(Button buttonView) {
-        System.out.println("Tapped letter: " + buttonView.getText() );
-        //TODO: is the button valid according to the current word?
-
-        // If so, add the new button's index to the current word
-        addLetterToCurrentWord(buttonView.getId());
-
-        return;
-    }
-
-    public void addLetterToCurrentWord(int newCharIndex) {
-        // Set the new word internally
-        currentWord.add(newCharIndex);
-
-        // Display the new word
-        updateCurrentWordDisplay();
-        return;
-    }
 
     public void setCurrentWord(ArrayList<Integer> newWord) {
         // Set the new word internally
